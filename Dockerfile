@@ -8,7 +8,7 @@ ENV GOOS=linux\
 COPY * /root/
 
 RUN go mod edit -replace github.com/fluent/fluent-bit-go=github.com/fluent/fluent-bit-go@master
-RUN go mod download & make all
+RUN go mod tidy & make all
 
 FROM fluent/fluent-bit:1.8.11
 
