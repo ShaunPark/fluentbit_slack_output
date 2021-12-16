@@ -101,6 +101,10 @@ func (s slackInfo) makeKernelAttachment(data map[interface{}]interface{}) slack.
 	var color, msg *string
 	fields := []*slack.Field{}
 	for key, val := range data {
+		log.Printf("%s, %v", key, val)
+	}
+
+	for key, val := range data {
 		keyStr := key.(string)
 		switch keyStr {
 		case "color":
