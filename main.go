@@ -105,7 +105,6 @@ func (s slackInfo) makeKernelAttachment(data map[interface{}]interface{}) slack.
 	}
 
 	for key, val := range data {
-
 		keyStr := key.(string)
 		if "color" == "keyStr" {
 			*color = val.(string)
