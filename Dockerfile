@@ -13,7 +13,7 @@ RUN go mod download & make all
 FROM fluent/fluent-bit:1.8.7
 
 COPY --from=gobuilder /root/out_prettyslack.so /fluent-bit/bin/
-COPY --from=gobuilder /root/fluent-bit.conf /fluent-bit/etc/
+COPY --from=gobuilder /root/fluentbit.conf /fluent-bit/etc/
 COPY --from=gobuilder /root/plugins.conf /fluent-bit/etc/
 
 EXPOSE 2020
