@@ -101,21 +101,21 @@ func (s slackInfo) makeKernelAttachment(data map[interface{}]interface{}) slack.
 	var color, msg *string
 	fields := []*slack.Field{}
 	for key, val := range data {
-		log.Printf("%s, %v", key, val)
+		log.Printf("%s, %V", key, val)
 	}
 
-	for key, val := range data {
-		keyStr := key.(string)
-		valStr := fmt.Sprintf("%V", val)
+	// for key, val := range data {
+	// 	keyStr := key.(string)
+	// 	valStr := fmt.Sprintf("%V", val)
 
-		if "color" == keyStr {
-			*color = valStr
-		} else if *s.field == keyStr {
-			*msg = valStr
-		} else {
-			fields = append(fields, &slack.Field{Title: keyStr, Value: valStr})
-		}
-	}
+	// 	if "color" == keyStr {
+	// 		*color = valStr
+	// 	} else if *s.field == keyStr {
+	// 		*msg = valStr
+	// 	} else {
+	// 		fields = append(fields, &slack.Field{Title: keyStr, Value: valStr})
+	// 	}
+	// }
 
 	if color == nil {
 		*color = "#A9AAAA"
