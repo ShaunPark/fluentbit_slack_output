@@ -11,6 +11,7 @@ import (
 //export FLBPluginRegister
 func FLBPluginRegister(ctx unsafe.Pointer) int {
 	// Gets called only once when the plugin.so is loaded
+	log.Print("[prettyslack] register")
 
 	return output.FLBPluginRegister(ctx, "prettyslack", "Slack output pretty")
 }
@@ -18,7 +19,7 @@ func FLBPluginRegister(ctx unsafe.Pointer) int {
 //export FLBPluginInit
 func FLBPluginInit(ctx unsafe.Pointer) int {
 	webhook := output.FLBPluginConfigKey(ctx, "webhook")
-	log.Printf("[multiinstance] webhook = %q", webhook)
+	log.Printf("[prettyslack] webhook = %q", webhook)
 	// Set the context to point to any Go variable
 	output.FLBPluginSetContext(ctx, webhook)
 	return output.FLB_OK
@@ -28,7 +29,7 @@ func FLBPluginInit(ctx unsafe.Pointer) int {
 func FLBPluginFlushCtx(ctx, data unsafe.Pointer, length C.int, tag *C.char) int {
 	// Gets called with a batch of records to be written to an instance.
 	webhook := output.FLBPluginGetContext(ctx).(string)
-	log.Printf("[multiinstance] Flush called for webhook: %s", webhook)
+	log.Printf("[prettyslack] Flush called for webhook: %s", webhook)
 	return output.FLB_OK
 }
 

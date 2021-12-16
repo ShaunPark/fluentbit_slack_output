@@ -1,4 +1,4 @@
-FROM golang:1.14 as gobuilder
+FROM golang:1.17 as gobuilder
 
 WORKDIR /root
 
@@ -10,7 +10,7 @@ COPY * /root/
 RUN go mod edit -replace github.com/fluent/fluent-bit-go=github.com/fluent/fluent-bit-go@master
 RUN go mod download & make all
 
-FROM fluent/fluent-bit:1.8.7
+FROM fluent/fluent-bit:1.8.11
 
 COPY --from=gobuilder /root/out_prettyslack.so /fluent-bit/bin/
 COPY --from=gobuilder /root/fluentbit.conf /fluent-bit/etc/
