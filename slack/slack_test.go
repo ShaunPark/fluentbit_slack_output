@@ -10,7 +10,7 @@ import (
 	"github.com/parnurzeal/gorequest"
 )
 
-const webhook = "https://hooks.slack.com/services/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"
+const webhook = ""
 const channel = "#fluentbit_test"
 
 func TestPtrn(t *testing.T) {
