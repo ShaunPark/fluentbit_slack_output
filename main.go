@@ -110,12 +110,11 @@ func (s slackInfo) makeKernelAttachment(data map[interface{}]interface{}) slack.
 			color = val.(*string)
 		} else if *s.field == keyStr {
 			log.Printf("%s %s", *s.field, keyStr)
-			msg = val.(*string)
+			*msg = fmt.Sprintf("%s", val)
 		} else {
 			switch val.(type) {
-			case *string:
-				value := val.(*string)
-				fields = append(fields, &slack.Field{Title: keyStr, Value: *value})
+			case []uint8:
+				fields = append(fields, &slack.Field{Title: keyStr, Value: fmt.Sprintf("%s", val)})
 			default:
 				fields = append(fields, &slack.Field{Title: keyStr, Value: fmt.Sprintf("%v", val)})
 			}
