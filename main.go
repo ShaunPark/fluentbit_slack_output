@@ -109,6 +109,7 @@ func (s slackInfo) makeKernelAttachment(data map[interface{}]interface{}) slack.
 		if "color" == "keyStr" {
 			*color = val.(string)
 		} else if *s.field == keyStr {
+			log.Printf("%s %s", *s.field, keyStr)
 			*msg = val.(string)
 		} else {
 			fields = append(fields, &slack.Field{Title: "Author", Value: "Ashwanth Kumar"})
