@@ -7,7 +7,7 @@ ENV GOOS=linux\
 
 COPY . .
 
-RUN go mod edit -replace github.com/fluent/fluent-bit-go=github.com/fluent/fluent-bit-go@master && go build -buildmode=c-shared -o out_prettyslack.so .
+RUN go mod edit -replace github.com/fluent/fluent-bit-go=github.com/fluent/fluent-bit-go@master && go mod tidy && go build -buildmode=c-shared -o out_prettyslack.so .
 
 FROM fluent/fluent-bit:1.8.11
 
