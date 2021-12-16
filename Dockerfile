@@ -5,9 +5,9 @@ WORKDIR /go/src/github.com/ShaunPark/fluentbit_slack_output
 ENV GOOS=linux\
     GOARCH=amd64
 
-COPY * /go/src/github.com/ShaunPark/fluentbit_slack_output/
+COPY . .
 
-RUN go mod edit -replace github.com/fluent/fluent-bit-go=github.com/fluent/fluent-bit-go@master && go mod tidy && make all
+RUN go mod edit -replace github.com/fluent/fluent-bit-go=github.com/fluent/fluent-bit-go@master && go build -buildmode=c-shared -o out_prettyslack.so .
 
 FROM fluent/fluent-bit:1.8.11
 
