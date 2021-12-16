@@ -1,19 +1,19 @@
 FROM golang:1.17 as gobuilder
 
-WORKDIR /root
+WORKDIR /go/src/github.com/ShaunPark/fluentbit_slack_output
 
 ENV GOOS=linux\
     GOARCH=amd64
 
-COPY * /root/
+COPY * /go/src/github.com/ShaunPark/fluentbit_slack_output/
 
 RUN go mod edit -replace github.com/fluent/fluent-bit-go=github.com/fluent/fluent-bit-go@master && go mod tidy && make all
 
 FROM fluent/fluent-bit:1.8.11
 
-COPY --from=gobuilder /root/out_prettyslack.so /fluent-bit/bin/
-COPY --from=gobuilder /root/fluent-bit.conf /fluent-bit/etc/
-COPY --from=gobuilder /root/plugins.conf /fluent-bit/etc/
+COPY --from=gobuilder /go/src/github.com/ShaunPark/fluentbit_slack_output/out_prettyslack.so /fluent-bit/bin/
+COPY --from=gobuilder /go/src/github.com/ShaunPark/fluentbit_slack_output/fluent-bit.conf /fluent-bit/etc/
+COPY --from=gobuilder /go/src/github.com/ShaunPark/fluentbit_slack_output/plugins.conf /fluent-bit/etc/
 
 EXPOSE 2020
 
