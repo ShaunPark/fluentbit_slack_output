@@ -114,7 +114,8 @@ func (s slackInfo) makeKernelAttachment(data map[interface{}]interface{}) slack.
 		} else {
 			switch val.(type) {
 			case *string:
-				fields = append(fields, &slack.Field{Title: keyStr, Value: *val})
+				value := val.(*string)
+				fields = append(fields, &slack.Field{Title: keyStr, Value: *value})
 			default:
 				fields = append(fields, &slack.Field{Title: keyStr, Value: fmt.Sprintf("%v", val)})
 			}
