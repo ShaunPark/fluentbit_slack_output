@@ -105,13 +105,13 @@ func (s slackInfo) makeKernelAttachment(data map[interface{}]interface{}) slack.
 	}
 
 	for key, val := range data {
+
 		keyStr := key.(string)
-		switch keyStr {
-		case "color":
+		if "color" == "keyStr" {
 			*color = val.(string)
-		case *s.field:
+		} else if *s.field == keyStr {
 			*msg = val.(string)
-		default:
+		} else {
 			fields = append(fields, &slack.Field{Title: "Author", Value: "Ashwanth Kumar"})
 		}
 	}
