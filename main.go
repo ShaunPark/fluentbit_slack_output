@@ -5,6 +5,7 @@ import (
 	"log"
 	"unsafe"
 
+	"github.com/ShaunPark/fluentbit_slack_output/slack"
 	"github.com/fluent/fluent-bit-go/output"
 )
 import (
@@ -23,9 +24,14 @@ func FLBPluginRegister(ctx unsafe.Pointer) int {
 //export FLBPluginInit
 func FLBPluginInit(ctx unsafe.Pointer) int {
 	webhook := output.FLBPluginConfigKey(ctx, "webhook")
-	log.Printf("[prettyslack] webhook = %q", webhook)
+	channel := output.FLBPluginConfigKey(ctx, "channel")
+	field := output.FLBPluginConfigKey(ctx, "textfield")
+	format := output.FLBPluginConfigKey(ctx, "format")
+
+	log.Printf("[prettyslack] webhook = %s#%s", webhook, channel)
+	sInfo := slackInfo{webhook: webhook, channel: channel, field: &field, format: &format}
 	// Set the context to point to any Go variable
-	output.FLBPluginSetContext(ctx, webhook)
+	output.FLBPluginSetContext(ctx, sInfo)
 	return output.FLB_OK
 }
 
@@ -37,12 +43,12 @@ func FLBPluginFlush(data unsafe.Pointer, length C.int, tag *C.char) int {
 //export FLBPluginFlushCtx
 func FLBPluginFlushCtx(ctx, data unsafe.Pointer, length C.int, tag *C.char) int {
 	// Gets called with a batch of records to be written to an instance.
-	webhook := output.FLBPluginGetContext(ctx).(string)
-	log.Printf("[prettyslack] Flush called for webhook: %s", webhook)
+	sInfo := output.FLBPluginGetContext(ctx).(slackInfo)
+	log.Printf("[prettyslack] Flush called for webhook: %s", sInfo.channel)
 
 	dec := output.NewDecoder(data, int(length))
 
-	count := 0
+	attachments := []slack.Attachment{}
 	for {
 		ret, ts, record := output.GetRecord(dec)
 		if ret != 0 {
@@ -59,18 +65,72 @@ func FLBPluginFlushCtx(ctx, data unsafe.Pointer, length C.int, tag *C.char) int 
 			fmt.Println("time provided invalid, defaulting to now.")
 			timestamp = time.Now()
 		}
+		record["timestamp"] = timestamp
 
-		// Print record keys and values
-		fmt.Printf("[%d] %s: [%s, {", count, C.GoString(tag), timestamp.String())
-
-		for k, v := range record {
-			fmt.Printf("\"%s\": %v, ", k, v)
+		switch *sInfo.format {
+		case "kernel":
+			attachments = append(attachments, sInfo.makeKernelAttachment(record))
+		default:
+			attachments = append(attachments, makeJsonAttachment(record))
 		}
-		fmt.Printf("}\n")
-		count++
+	}
+
+	header := "header"
+	pText := "plain_text"
+	hdrMsg := "Kernel logs by fluent-bit"
+	emoji := true
+
+	blocks := []slack.Block{}
+	blocks = append(blocks, slack.Block{Type: &header, Text: &slack.TextBlock{Type: &pText, Text: &hdrMsg, Emoji: &emoji}})
+
+	payload := slack.Payload{
+		Attachments: attachments,
+		Channel:     sInfo.channel,
+		Blocks:      blocks,
+	}
+
+	err := slack.Send(sInfo.webhook, "", payload)
+	if len(err) > 0 {
+		fmt.Printf("error: %s\n", err)
 	}
 
 	return output.FLB_OK
+}
+
+func (s slackInfo) makeKernelAttachment(data map[interface{}]interface{}) slack.Attachment {
+	var color, msg *string
+	fields := []*slack.Field{}
+	for key, val := range data {
+		keyStr := key.(string)
+		switch keyStr {
+		case "color":
+			*color = val.(string)
+		case *s.field:
+			*msg = val.(string)
+		default:
+			fields = append(fields, &slack.Field{Title: "Author", Value: "Ashwanth Kumar"})
+		}
+	}
+
+	if color == nil {
+		*color = "#A9AAAA"
+	}
+	if msg == nil {
+		*msg = ""
+	}
+	attachment1 := slack.Attachment{Color: color, Text: msg, Fields: fields}
+	return attachment1
+}
+
+func makeJsonAttachment(data map[interface{}]interface{}) slack.Attachment {
+	return slack.Attachment{}
+}
+
+type slackInfo struct {
+	webhook string
+	channel string
+	field   *string
+	format  *string
 }
 
 //export FLBPluginExit

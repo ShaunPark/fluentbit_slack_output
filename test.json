@@ -1,0 +1,26 @@
+{
+    "blocks": [
+        {
+            "type": "header",
+            "text": {
+                "type": "plain_text",
+                "text": "Header Message",
+                "emoji": true
+            }
+        },
+        {
+            "type": "plain_text",
+            "elements": [
+                {
+                    "type": "mrkdwn",
+                    "text": "*This* is :smile: markdown"
+                },
+                {
+                    "type": "plain_text",
+                    "text": "Author: K A Applegate",
+                    "emoji": true
+                }
+            ]
+        }
+    ]
+}
