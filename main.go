@@ -29,9 +29,10 @@ func FLBPluginInit(ctx unsafe.Pointer) int {
 	channel := output.FLBPluginConfigKey(ctx, "channel")
 	field := output.FLBPluginConfigKey(ctx, "textfield")
 	format := output.FLBPluginConfigKey(ctx, "format")
+	title := output.FLBPluginConfigKey(ctx, "title")
 
 	log.Printf("[prettyslack] webhook = %s#%s", webhook, channel)
-	sInfo := slackInfo{webhook: webhook, channel: channel, field: &field, format: &format}
+	sInfo := slackInfo{webhook: webhook, channel: channel, field: &field, format: &format, title: &title}
 	// Set the context to point to any Go variable
 	output.FLBPluginSetContext(ctx, sInfo)
 	return output.FLB_OK
@@ -94,6 +95,9 @@ func sendSlack(sInfo slackInfo, attachments []slack.Attachment) {
 	header := "header"
 	pText := "plain_text"
 	hdrMsg := "Kernel logs by fluent-bit"
+	if sInfo.title != nil || *(sInfo.title) != "" {
+		hdrMsg = *sInfo.title
+	}
 	emoji := true
 
 	blocks := []slack.Block{}
@@ -149,6 +153,7 @@ type slackInfo struct {
 	channel string
 	field   *string
 	format  *string
+	title   *string
 }
 
 //export FLBPluginExit
