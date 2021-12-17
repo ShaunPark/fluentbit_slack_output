@@ -4,7 +4,7 @@ Fluentbit Slack Outputn Plugin
 
 Original slack output plugin can just send whole data and does not support formatting.
 
-![sample slack message](https://github.com/ShaunPark/fluentbit_slack_output/images/fl_output.png)
+![sample slack message](https://github.com/ShaunPark/fluentbit_slack_output/blob/main/images/fl_output.png)
 
 ```
     [OUTPUT]
