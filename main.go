@@ -50,6 +50,7 @@ func FLBPluginFlushCtx(ctx, data unsafe.Pointer, length C.int, tag *C.char) int 
 	dec := output.NewDecoder(data, int(length))
 
 	attachments := []slack.Attachment{}
+
 	for {
 		ret, ts, record := output.GetRecord(dec)
 		if ret != 0 {
@@ -74,8 +75,21 @@ func FLBPluginFlushCtx(ctx, data unsafe.Pointer, length C.int, tag *C.char) int 
 		default:
 			attachments = append(attachments, makeJsonAttachment(record))
 		}
+
+		if len(attachments) == 5 {
+			sendSlack(sInfo, attachments)
+			attachments = []slack.Attachment{}
+		}
 	}
 
+	if len(attachments) > 0 {
+		sendSlack(sInfo, attachments)
+	}
+
+	return output.FLB_OK
+}
+
+func sendSlack(sInfo slackInfo, attachments []slack.Attachment) {
 	header := "header"
 	pText := "plain_text"
 	hdrMsg := "Kernel logs by fluent-bit"
@@ -94,17 +108,12 @@ func FLBPluginFlushCtx(ctx, data unsafe.Pointer, length C.int, tag *C.char) int 
 	if len(err) > 0 {
 		fmt.Printf("error: %s\n", err)
 	}
-
-	return output.FLB_OK
 }
 
 func (s slackInfo) makeKernelAttachment(data map[interface{}]interface{}) slack.Attachment {
 	color := "#A9AAAA"
 	msg := ""
 	fields := []*slack.Field{}
-	// for key, val := range data {
-	// 	log.Printf("%s, %v, %s", key, val, reflect.TypeOf(val))
-	// }
 
 	for key, val := range data {
 		keyStr := key.(string)
@@ -122,13 +131,7 @@ func (s slackInfo) makeKernelAttachment(data map[interface{}]interface{}) slack.
 		}
 	}
 
-	for _, v := range fields {
-		log.Printf("%s, %s", v.Title, v.Value)
-	}
-
-	log.Printf("%s, %s", color, msg)
-
-	attachment1 := slack.Attachment{Color: &color, Text: &msg}
+	attachment1 := slack.Attachment{Color: &color, Text: &msg, Fields: fields}
 	return attachment1
 }
 
