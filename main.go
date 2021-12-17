@@ -9,11 +9,10 @@ import (
 	"github.com/fluent/fluent-bit-go/output"
 )
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"time"
-
-	"k8s.io/apimachinery/pkg/util/json"
 )
 
 //export FLBPluginRegister
