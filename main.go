@@ -9,9 +9,9 @@ import (
 	"github.com/fluent/fluent-bit-go/output"
 )
 import (
-	"encoding/json"
 	"fmt"
 	"reflect"
+	"strconv"
 	"time"
 )
 
@@ -27,12 +27,21 @@ func FLBPluginRegister(ctx unsafe.Pointer) int {
 func FLBPluginInit(ctx unsafe.Pointer) int {
 	webhook := output.FLBPluginConfigKey(ctx, "webhook")
 	channel := output.FLBPluginConfigKey(ctx, "channel")
-	field := output.FLBPluginConfigKey(ctx, "textfield")
-	format := output.FLBPluginConfigKey(ctx, "format")
+	field := output.FLBPluginConfigKey(ctx, "message_field")
 	title := output.FLBPluginConfigKey(ctx, "title")
+	maxAttachment := output.FLBPluginConfigKey(ctx, "max_attachment")
+
+	maxAttatch, err := strconv.Atoi(maxAttachment)
+	if err != nil {
+		maxAttatch = 5
+	}
+
+	if maxAttatch > 20 {
+		maxAttatch = 20
+	}
 
 	log.Printf("[prettyslack] webhook = %s#%s", webhook, channel)
-	sInfo := slackInfo{webhook: webhook, channel: channel, field: &field, format: &format, title: &title}
+	sInfo := slackInfo{webhook: webhook, channel: channel, field: &field, title: &title, maxAttachment: maxAttatch}
 	// Set the context to point to any Go variable
 	output.FLBPluginSetContext(ctx, sInfo)
 	return output.FLB_OK
@@ -71,14 +80,9 @@ func FLBPluginFlushCtx(ctx, data unsafe.Pointer, length C.int, tag *C.char) int 
 		}
 		record["timestamp"] = timestamp
 
-		switch *sInfo.format {
-		case "kernel":
-			attachments = append(attachments, sInfo.makeKernelAttachment(record))
-		default:
-			attachments = append(attachments, makeJsonAttachment(record))
-		}
+		attachments = append(attachments, sInfo.makeAttachment(record))
 
-		if len(attachments) == 5 {
+		if len(attachments) == sInfo.maxAttachment {
 			sendSlack(sInfo, attachments)
 			attachments = []slack.Attachment{}
 		}
@@ -91,17 +95,27 @@ func FLBPluginFlushCtx(ctx, data unsafe.Pointer, length C.int, tag *C.char) int 
 	return output.FLB_OK
 }
 
+const (
+	DEFAULT_TITLE string = "Kernel logs by fluent-bit"
+	BLOCK_TYPE    string = "header"
+	TEXT_TYPE     string = "plain_text"
+	EMPTY_STRING  string = ""
+	DEFAULT_COLOR string = "#A9AAAA"
+	UINT_ARR_TYPE string = "[]uint8"
+	KEY_COLOR     string = "color"
+)
+
 func sendSlack(sInfo slackInfo, attachments []slack.Attachment) {
-	header := "header"
-	pText := "plain_text"
-	hdrMsg := "Kernel logs by fluent-bit"
-	if sInfo.title != nil || *(sInfo.title) != "" {
-		hdrMsg = *sInfo.title
+	blockType := BLOCK_TYPE
+	textType := TEXT_TYPE
+	title := DEFAULT_TITLE
+	if sInfo.title != nil || *(sInfo.title) != EMPTY_STRING {
+		title = *sInfo.title
 	}
 	emoji := true
 
 	blocks := []slack.Block{}
-	blocks = append(blocks, slack.Block{Type: &header, Text: &slack.TextBlock{Type: &pText, Text: &hdrMsg, Emoji: &emoji}})
+	blocks = append(blocks, slack.Block{Type: &blockType, Text: &slack.TextBlock{Type: &textType, Text: &title, Emoji: &emoji}})
 
 	payload := slack.Payload{
 		Attachments: attachments,
@@ -115,45 +129,35 @@ func sendSlack(sInfo slackInfo, attachments []slack.Attachment) {
 	}
 }
 
-func (s slackInfo) makeKernelAttachment(data map[interface{}]interface{}) slack.Attachment {
-	color := "#A9AAAA"
-	msg := ""
-	fields := []*slack.Field{}
+func (s slackInfo) makeAttachment(data map[interface{}]interface{}) slack.Attachment {
+	color := DEFAULT_COLOR
+	msg := EMPTY_STRING
+	attachment := slack.Attachment{Color: &color, Title: &msg}
 
 	for key, val := range data {
 		keyStr := key.(string)
 		valStr := fmt.Sprintf("%v", val)
-		if reflect.TypeOf(val).String() == "[]uint8" {
+		if reflect.TypeOf(val).String() == UINT_ARR_TYPE {
 			valStr = string(val.([]byte))
 		}
 
-		if keyStr == "color" {
-			color = valStr
-		} else if *s.field == keyStr {
-			msg = valStr
+		if keyStr == KEY_COLOR {
+			attachment.Color = &valStr
+		} else if *s.field == keyStr && keyStr != EMPTY_STRING {
+			attachment.Title = &valStr
 		} else {
-			fields = append(fields, &slack.Field{Title: keyStr, Value: valStr})
+			attachment.AddField(slack.Field{Title: keyStr, Value: valStr})
 		}
 	}
-
-	attachment := slack.Attachment{Color: &color, Text: &msg, Fields: fields}
-	return attachment
-}
-
-func makeJsonAttachment(data map[interface{}]interface{}) slack.Attachment {
-	msg, _ := json.Marshal(data)
-	msgStr := string(msg)
-	log.Printf("%s", msgStr)
-	attachment := slack.Attachment{Text: &msgStr}
 	return attachment
 }
 
 type slackInfo struct {
-	webhook string
-	channel string
-	field   *string
-	format  *string
-	title   *string
+	webhook       string
+	channel       string
+	field         *string
+	title         *string
+	maxAttachment int
 }
 
 //export FLBPluginExit

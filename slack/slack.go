@@ -38,6 +38,7 @@ type Attachment struct {
 	Actions      []*Action `json:"actions"`
 	CallbackID   *string   `json:"callback_id"`
 	ThumbnailUrl *string   `json:"thumb_url"`
+	Blocks       []*Block  `json:"blocks,omitempty"`
 }
 
 type Payload struct {
@@ -62,6 +63,11 @@ func (attachment *Attachment) AddField(field Field) *Attachment {
 
 func (attachment *Attachment) AddAction(action Action) *Attachment {
 	attachment.Actions = append(attachment.Actions, &action)
+	return attachment
+}
+
+func (attachment *Attachment) AddBlock(block Block) *Attachment {
+	attachment.Blocks = append(attachment.Blocks, &block)
 	return attachment
 }
 
