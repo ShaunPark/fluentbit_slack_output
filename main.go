@@ -132,15 +132,16 @@ func (s slackInfo) makeKernelAttachment(data map[interface{}]interface{}) slack.
 		}
 	}
 
-	attachment1 := slack.Attachment{Color: &color, Text: &msg, Fields: fields}
-	return attachment1
+	attachment := slack.Attachment{Color: &color, Text: &msg, Fields: fields}
+	return attachment
 }
 
 func makeJsonAttachment(data map[interface{}]interface{}) slack.Attachment {
 	msg, _ := json.Marshal(data)
 	msgStr := string(msg)
-	attachment1 := slack.Attachment{Text: &msgStr}
-	return attachment1
+	log.Printf("%s", msgStr)
+	attachment := slack.Attachment{Text: &msgStr}
+	return attachment
 }
 
 type slackInfo struct {
