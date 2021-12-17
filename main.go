@@ -102,24 +102,33 @@ func (s slackInfo) makeKernelAttachment(data map[interface{}]interface{}) slack.
 	color := "#A9AAAA"
 	msg := ""
 	fields := []*slack.Field{}
-	for key, val := range data {
-		log.Printf("%s, %v, %s", key, val, reflect.TypeOf(val))
-	}
-
 	// for key, val := range data {
-	// 	keyStr := key.(string)
-	// 	valStr := fmt.Sprintf("%v", val)
-
-	// 	if "color" == keyStr {
-	// 		color = valStr
-	// 	} else if *s.field == keyStr {
-	// 		msg = valStr
-	// 	} else {
-	// 		fields = append(fields, &slack.Field{Title: keyStr, Value: valStr})
-	// 	}
+	// 	log.Printf("%s, %v, %s", key, val, reflect.TypeOf(val))
 	// }
 
-	attachment1 := slack.Attachment{Color: &color, Text: &msg, Fields: fields}
+	for key, val := range data {
+		keyStr := key.(string)
+		valStr := fmt.Sprintf("%v", val)
+		if reflect.TypeOf(val).String() == "[]uint8" {
+			valStr = string(val.([]byte))
+		}
+
+		if keyStr == "color" {
+			color = valStr
+		} else if *s.field == keyStr {
+			msg = valStr
+		} else {
+			fields = append(fields, &slack.Field{Title: keyStr, Value: valStr})
+		}
+	}
+
+	for _, v := range fields {
+		log.Printf("%s, %s", v.Title, v.Value)
+	}
+
+	log.Printf("%s, %s", color, msg)
+
+	attachment1 := slack.Attachment{Color: &color, Text: &msg}
 	return attachment1
 }
 
