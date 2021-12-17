@@ -98,31 +98,26 @@ func FLBPluginFlushCtx(ctx, data unsafe.Pointer, length C.int, tag *C.char) int 
 }
 
 func (s slackInfo) makeKernelAttachment(data map[interface{}]interface{}) slack.Attachment {
-	var color, msg *string
+	color := "#A9AAAA"
+	msg := ""
 	fields := []*slack.Field{}
 	for key, val := range data {
-		log.Printf("%s, %V", key, val)
+		log.Printf("%s, %v", key, val)
 	}
 
-	// for key, val := range data {
-	// 	keyStr := key.(string)
-	// 	valStr := fmt.Sprintf("%V", val)
+	for key, val := range data {
+		keyStr := key.(string)
+		valStr := fmt.Sprintf("%v", val)
 
-	// 	if "color" == keyStr {
-	// 		*color = valStr
-	// 	} else if *s.field == keyStr {
-	// 		*msg = valStr
-	// 	} else {
-	// 		fields = append(fields, &slack.Field{Title: keyStr, Value: valStr})
-	// 	}
-	// }
+		if "color" == keyStr {
+			color = valStr
+		} else if *s.field == keyStr {
+			msg = valStr
+		} else {
+			fields = append(fields, &slack.Field{Title: keyStr, Value: valStr})
+		}
+	}
 
-	if color == nil {
-		*color = "#A9AAAA"
-	}
-	if msg == nil {
-		*msg = ""
-	}
 	attachment1 := slack.Attachment{Color: color, Text: msg, Fields: fields}
 	return attachment1
 }
