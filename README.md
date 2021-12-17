@@ -23,6 +23,8 @@ Original slack output plugin can just send whole data and does not support forma
 - Message_Field : key for first line of slack message
 - Max_Attachments : number of max attachments of 1 slack message. ( Defaut : 5, Max : 20)
 
+- Color value of attachment from data with key 'color' (Default : #A9AAAA)
+
 # Reference
 
 "slack.go" : copied from https://github.com/ashwanthkumar/slack-go-webhook and modified to add block feature
