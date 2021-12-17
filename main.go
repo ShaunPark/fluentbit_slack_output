@@ -118,7 +118,7 @@ func (s slackInfo) makeKernelAttachment(data map[interface{}]interface{}) slack.
 		}
 	}
 
-	attachment1 := slack.Attachment{Color: color, Text: msg, Fields: fields}
+	attachment1 := slack.Attachment{Color: &color, Text: &msg, Fields: fields}
 	return attachment1
 }
 
