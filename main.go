@@ -12,6 +12,8 @@ import (
 	"fmt"
 	"reflect"
 	"time"
+
+	"k8s.io/apimachinery/pkg/util/json"
 )
 
 //export FLBPluginRegister
@@ -136,7 +138,10 @@ func (s slackInfo) makeKernelAttachment(data map[interface{}]interface{}) slack.
 }
 
 func makeJsonAttachment(data map[interface{}]interface{}) slack.Attachment {
-	return slack.Attachment{}
+	msg, _ := json.Marshal(data)
+	msgStr := string(msg)
+	attachment1 := slack.Attachment{Text: &msgStr}
+	return attachment1
 }
 
 type slackInfo struct {
