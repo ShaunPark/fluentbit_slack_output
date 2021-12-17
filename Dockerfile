@@ -17,5 +17,4 @@ COPY --from=gobuilder /go/src/github.com/ShaunPark/fluentbit_slack_output/plugin
 
 EXPOSE 2020
 
-# CMD ["/fluent-bit/bin/fluent-bit", "--plugin", "/fluent-bit/bin/out_multiinstance.so", "--config", "/fluent-bit/etc/fluent-bit.conf"]
 CMD ["/fluent-bit/bin/fluent-bit", "--config", "/fluent-bit/etc/fluent-bit.conf"]

@@ -115,7 +115,7 @@ func sendSlack(sInfo slackInfo, attachments []slack.Attachment) {
 	emoji := true
 
 	blocks := []slack.Block{}
-	blocks = append(blocks, slack.Block{Type: &blockType, Text: &slack.TextBlock{Type: &textType, Text: &title, Emoji: &emoji}})
+	blocks = append(blocks, slack.Block{Type: &blockType, Text: &slack.Text{Type: &textType, Text: &title, Emoji: &emoji}})
 
 	payload := slack.Payload{
 		Attachments: attachments,
