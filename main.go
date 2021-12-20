@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -96,13 +97,15 @@ func FLBPluginFlushCtx(ctx, data unsafe.Pointer, length C.int, tag *C.char) int 
 }
 
 const (
-	DEFAULT_TITLE string = "Kernel logs by fluent-bit"
-	BLOCK_TYPE    string = "header"
-	TEXT_TYPE     string = "plain_text"
-	EMPTY_STRING  string = ""
-	DEFAULT_COLOR string = "#A9AAAA"
-	UINT_ARR_TYPE string = "[]uint8"
-	KEY_COLOR     string = "color"
+	DEFAULT_TITLE      string = "Kernel logs by fluent-bit"
+	BLOCK_TYPE         string = "header"
+	TEXT_TYPE          string = "plain_text"
+	EMPTY_STRING       string = ""
+	DEFAULT_COLOR      string = "#A9AAAA"
+	UINT_ARR_TYPE      string = "[]uint8"
+	KEY_COLOR          string = "color"
+	BLOCK_TYPE_SECTION string = "section"
+	TEXT_TYPE_MRKDWN   string = "mrkdwn"
 )
 
 func sendSlack(sInfo slackInfo, attachments []slack.Attachment) {
@@ -134,6 +137,7 @@ func (s slackInfo) makeAttachment(data map[interface{}]interface{}) slack.Attach
 	msg := EMPTY_STRING
 	attachment := slack.Attachment{Color: &color, Title: &msg}
 
+	fieldStrs := []string{}
 	for key, val := range data {
 		keyStr := key.(string)
 		valStr := fmt.Sprintf("%v", val)
@@ -146,9 +150,14 @@ func (s slackInfo) makeAttachment(data map[interface{}]interface{}) slack.Attach
 		} else if *s.field == keyStr && keyStr != EMPTY_STRING {
 			attachment.Title = &valStr
 		} else {
-			attachment.AddField(slack.Field{Title: keyStr, Value: valStr})
+			fieldStrs = append(fieldStrs, fmt.Sprintf("%s: `%s`", keyStr, valStr))
 		}
 	}
+	blockType := BLOCK_TYPE_SECTION
+	textType := TEXT_TYPE_MRKDWN
+	text := strings.Join(fieldStrs[:], "\n")
+
+	attachment.AddBlock(slack.Block{Type: &blockType, Text: &slack.Text{Type: &textType, Text: &text}})
 	return attachment
 }
 
