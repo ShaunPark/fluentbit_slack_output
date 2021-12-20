@@ -21,24 +21,24 @@ type Action struct {
 }
 
 type Attachment struct {
-	Fallback     *string   `json:"fallback"`
-	Color        *string   `json:"color"`
-	PreText      *string   `json:"pretext"`
-	AuthorName   *string   `json:"author_name"`
-	AuthorLink   *string   `json:"author_link"`
-	AuthorIcon   *string   `json:"author_icon"`
-	Title        *string   `json:"title"`
-	TitleLink    *string   `json:"title_link"`
-	Text         *string   `json:"text"`
-	ImageUrl     *string   `json:"image_url"`
-	Fields       []*Field  `json:"fields"`
-	Footer       *string   `json:"footer"`
-	FooterIcon   *string   `json:"footer_icon"`
-	Timestamp    *int64    `json:"ts"`
-	MarkdownIn   *[]string `json:"mrkdwn_in"`
-	Actions      []*Action `json:"actions"`
-	CallbackID   *string   `json:"callback_id"`
-	ThumbnailUrl *string   `json:"thumb_url"`
+	Fallback     *string   `json:"fallback,omitempty"`
+	Color        *string   `json:"color,omitempty"`
+	PreText      *string   `json:"pretext,omitempty"`
+	AuthorName   *string   `json:"author_name,omitempty"`
+	AuthorLink   *string   `json:"author_link,omitempty"`
+	AuthorIcon   *string   `json:"author_icon,omitempty"`
+	Title        *string   `json:"title,omitempty"`
+	TitleLink    *string   `json:"title_link,omitempty"`
+	Text         *string   `json:"text,omitempty"`
+	ImageUrl     *string   `json:"image_url,omitempty"`
+	Fields       []*Field  `json:"fields,omitempty"`
+	Footer       *string   `json:"footer,omitempty"`
+	FooterIcon   *string   `json:"footer_icon,omitempty"`
+	Timestamp    *int64    `json:"ts,omitempty"`
+	MarkdownIn   *[]string `json:"mrkdwn_in,omitempty"`
+	Actions      []*Action `json:"actions,omitempty"`
+	CallbackID   *string   `json:"callback_id,omitempty"`
+	ThumbnailUrl *string   `json:"thumb_url,omitempty"`
 	Blocks       []*Block  `json:"blocks,omitempty"`
 }
 

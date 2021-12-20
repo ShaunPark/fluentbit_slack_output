@@ -1,0 +1,28 @@
+{
+    "channel": "fluent-test",
+    "attachments": [
+        {
+            "color": "#FF0000",
+            "title": "TEST MESSAGE",
+            "blocks": [
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "nodeName: nodeName"
+                    }
+                }
+            ]
+        }
+    ],
+    "blocks": [
+        {
+            "type": "header",
+            "text": {
+                "type": "plain_text",
+                "text": "Title message",
+                "emoji": true
+            }
+        }
+    ]
+}
