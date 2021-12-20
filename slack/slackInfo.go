@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"sort"
 	"strings"
 )
 
@@ -76,7 +77,8 @@ func (s *SlackInfo) MakeAttachment(data map[interface{}]interface{}) Attachment 
 	}
 	blockType := BLOCK_TYPE_SECTION
 	textType := TEXT_TYPE_MRKDWN
-	text := strings.Join(fieldStrs[:], "\n")
+	sort.Strings(fieldStrs)
+	text := strings.Join(fieldStrs, "\n")
 	log.Print(text)
 	msg = fmt.Sprintf("*%s*", msg)
 	attachment.AddBlock(Block{Type: &blockType, Text: &Text{Type: &textType, Text: &msg}})
