@@ -55,7 +55,7 @@ func (s *SlackInfo) SendSlack(attachments []Attachment) {
 
 func (s *SlackInfo) MakeAttachment(data map[interface{}]interface{}) Attachment {
 	color := DEFAULT_COLOR
-	// msg := EMPTY_STRING
+	msg := "title message"
 	attachment := Attachment{Color: &color}
 
 	fieldStrs := []string{}
@@ -68,8 +68,8 @@ func (s *SlackInfo) MakeAttachment(data map[interface{}]interface{}) Attachment 
 
 		if keyStr == KEY_COLOR {
 			attachment.Color = &valStr
-			// } else if *s.Field == keyStr && keyStr != EMPTY_STRING {
-			// attachment.Title = &valStr
+		} else if *s.Field == keyStr && keyStr != EMPTY_STRING {
+			msg = valStr
 		} else {
 			fieldStrs = append(fieldStrs, fmt.Sprintf("%s: `%s`", strings.ToUpper(keyStr[:1])+keyStr[1:], valStr))
 		}
@@ -78,6 +78,8 @@ func (s *SlackInfo) MakeAttachment(data map[interface{}]interface{}) Attachment 
 	textType := TEXT_TYPE_MRKDWN
 	text := strings.Join(fieldStrs[:], "\n")
 	log.Print(text)
+	msg = fmt.Sprintf("*%s*", msg)
+	attachment.AddBlock(Block{Type: &blockType, Text: &Text{Type: &textType, Text: &msg}})
 	attachment.AddBlock(Block{Type: &blockType, Text: &Text{Type: &textType, Text: &text}})
 	return attachment
 }
