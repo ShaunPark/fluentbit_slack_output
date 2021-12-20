@@ -2,9 +2,9 @@ package slack
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/parnurzeal/gorequest"
-	"github.com/prometheus/common/log"
 )
 
 type Field struct {
@@ -88,7 +88,7 @@ func Send(webhookUrl string, proxy string, payload Payload) []error {
 		return err
 	}
 	if resp.StatusCode >= 400 {
-		log.Error(resp)
+		log.Print(resp)
 		return []error{fmt.Errorf("error sending msg. status: %v", resp.Status)}
 	}
 
