@@ -71,7 +71,7 @@ func (s *SlackInfo) MakeAttachment(data map[interface{}]interface{}) Attachment 
 			// } else if *s.Field == keyStr && keyStr != EMPTY_STRING {
 			// attachment.Title = &valStr
 		} else {
-			fieldStrs = append(fieldStrs, fmt.Sprintf("%s: `%s`", keyStr, valStr))
+			fieldStrs = append(fieldStrs, fmt.Sprintf("%s: `%s`", strings.ToUpper(keyStr[:1])+keyStr[1:], valStr))
 		}
 	}
 	blockType := BLOCK_TYPE_SECTION
