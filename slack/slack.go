@@ -78,6 +78,7 @@ func redirectPolicyFunc(req gorequest.Request, via []gorequest.Request) error {
 
 func Send(webhookUrl string, proxy string, payload Payload) []error {
 	request := gorequest.New().Proxy(proxy)
+	request.Header.Set("Content-Type", "application/json")
 	resp, _, err := request.
 		Post(webhookUrl).
 		RedirectPolicy(redirectPolicyFunc).
